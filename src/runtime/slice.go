@@ -12,10 +12,11 @@ import (
 	"unsafe"
 )
 
+// slice 切片
 type slice struct {
-	array unsafe.Pointer
-	len   int
-	cap   int
+	array unsafe.Pointer // 指向底层数组的指针
+	len   int            // 切片长度
+	cap   int            // 切片容量
 }
 
 // A notInHeapSlice is a slice backed by runtime/internal/sys.NotInHeap memory.
@@ -154,6 +155,7 @@ func mulUintptr(a, b uintptr) (uintptr, bool) {
 // new length so that the old length is not live (does not need to be
 // spilled/restored) and the new length is returned (also does not need
 // to be spilled/restored).
+// 切片扩容机制
 func growslice(oldPtr unsafe.Pointer, newLen, oldCap, num int, et *_type) slice {
 	oldLen := newLen - num
 	if raceenabled {
@@ -192,6 +194,7 @@ func growslice(oldPtr unsafe.Pointer, newLen, oldCap, num int, et *_type) slice 
 				// Transition from growing 2x for small slices
 				// to growing 1.25x for large slices. This formula
 				// gives a smooth-ish transition between the two.
+				// go 1.18 之后的扩容算法改变
 				newcap += (newcap + 3*threshold) / 4
 			}
 			// Set newcap to the requested cap when
@@ -212,6 +215,7 @@ func growslice(oldPtr unsafe.Pointer, newLen, oldCap, num int, et *_type) slice 
 	case et.Size_ == 1:
 		lenmem = uintptr(oldLen)
 		newlenmem = uintptr(newLen)
+		// roundupsize 内存对齐函数，导致存在扩容大小出现差异
 		capmem = roundupsize(uintptr(newcap))
 		overflow = uintptr(newcap) > maxAlloc
 		newcap = int(capmem)

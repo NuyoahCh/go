@@ -10,7 +10,9 @@
 package runtime
 
 // Returns size of the memory block that mallocgc will allocate if you ask for the size.
+// 内存对齐函数
 func roundupsize(size uintptr) uintptr {
+	// Small sizes are rounded up to a multiple of 8. 小的内存块按8字节对齐
 	if size < _MaxSmallSize {
 		if size <= smallSizeMax-8 {
 			return uintptr(class_to_size[size_to_class8[divRoundUp(size, smallSizeDiv)]])
@@ -18,6 +20,7 @@ func roundupsize(size uintptr) uintptr {
 			return uintptr(class_to_size[size_to_class128[divRoundUp(size-smallSizeMax, largeSizeDiv)]])
 		}
 	}
+	// Large sizes are rounded up to a multiple of _PageSize. 大的内存块按页大小对齐
 	if size+_PageSize < size {
 		return size
 	}
