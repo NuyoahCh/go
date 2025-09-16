@@ -181,6 +181,8 @@ type IntegerType int
 //	hdr.Data = uintptr(unsafe.Pointer(p))
 //	hdr.Len = n
 //	s := *(*string)(unsafe.Pointer(&hdr)) // p possibly already lost
+//
+// 通用指针类型，不能参与任何运算，任何类型都可以进行转化
 type Pointer *ArbitraryType
 
 // Sizeof takes an expression x of any type and returns the size in bytes
@@ -193,6 +195,7 @@ type Pointer *ArbitraryType
 // does not have variable size.
 // (A type has variable size if it is a type parameter or if it is an array
 // or struct type with elements of variable size).
+// 获取长度大小
 func Sizeof(x ArbitraryType) uintptr
 
 // Offsetof returns the offset within the struct of the field represented by x,
@@ -201,6 +204,7 @@ func Sizeof(x ArbitraryType) uintptr
 // The return value of Offsetof is a Go constant if the type of the argument x
 // does not have variable size.
 // (See the description of [Sizeof] for a definition of variable sized types.)
+// x 字段在结构体中的偏移量
 func Offsetof(x ArbitraryType) uintptr
 
 // Alignof takes an expression x of any type and returns the required alignment
