@@ -25,22 +25,23 @@ import (
 )
 
 const (
-	maxAlign  = 8
-	hchanSize = unsafe.Sizeof(hchan{}) + uintptr(-int(unsafe.Sizeof(hchan{}))&(maxAlign-1))
-	debugChan = false
+	maxAlign  = 8                                                                           // 最大对齐
+	hchanSize = unsafe.Sizeof(hchan{}) + uintptr(-int(unsafe.Sizeof(hchan{}))&(maxAlign-1)) // 对齐到maxAlign的整数倍
+	debugChan = false                                                                       // 是否开启调试模式
 )
 
+// channel 底层数据结构
 type hchan struct {
-	qcount   uint           // total data in the queue
-	dataqsiz uint           // size of the circular queue
-	buf      unsafe.Pointer // points to an array of dataqsiz elements
-	elemsize uint16
-	closed   uint32
-	elemtype *_type // element type
-	sendx    uint   // send index
-	recvx    uint   // receive index
-	recvq    waitq  // list of recv waiters
-	sendq    waitq  // list of send waiters
+	qcount   uint           // total data in the queue (读队列中的元素数量)
+	dataqsiz uint           // size of the circular queue (队列的容量)
+	buf      unsafe.Pointer // points to an array of dataqsiz elements of size elemsize (队列的缓冲区) buf 指针
+	elemsize uint16         // size of each element (每个元素的大小)
+	closed   uint32         // closed indicates whether the channel has been closed (是否关闭)
+	elemtype *_type         // element type (元素类型)
+	sendx    uint           // send index (写队列的索引)
+	recvx    uint           // receive index (读队列的索引)
+	recvq    waitq          // list of recv waiters (读队列)
+	sendq    waitq          // list of send waiters (写队列)
 
 	// lock protects all fields in hchan, as well as several
 	// fields in sudogs blocked on this channel.
@@ -48,7 +49,7 @@ type hchan struct {
 	// Do not change another G's status while holding this lock
 	// (in particular, do not ready a G), as this can deadlock
 	// with stack shrinking.
-	lock mutex
+	lock mutex // lock for this channel (channel 锁)
 }
 
 type waitq struct {
