@@ -65,10 +65,12 @@ import (
 // API boundaries.
 //
 // Context's methods may be called by multiple goroutines simultaneously.
+// Context 接口
 type Context interface {
 	// Deadline returns the time when work done on behalf of this context
 	// should be canceled. Deadline returns ok==false when no deadline is
 	// set. Successive calls to Deadline return the same results.
+	// 截止时间，time 时间，ok 布尔值，表示是否设置了截止时间
 	Deadline() (deadline time.Time, ok bool)
 
 	// Done returns a channel that's closed when work done on behalf of this
@@ -102,6 +104,7 @@ type Context interface {
 	//
 	// See https://blog.golang.org/pipelines for more examples of how to use
 	// a Done channel for cancellation.
+	// 完成标识
 	Done() <-chan struct{}
 
 	// If Done is not yet closed, Err returns nil.
@@ -109,6 +112,7 @@ type Context interface {
 	// Canceled if the context was canceled
 	// or DeadlineExceeded if the context's deadline passed.
 	// After Err returns a non-nil error, successive calls to Err return the same error.
+	// 错误信息
 	Err() error
 
 	// Value returns the value associated with this context for key, or nil
@@ -156,6 +160,7 @@ type Context interface {
 	// 		u, ok := ctx.Value(userKey).(*User)
 	// 		return u, ok
 	// 	}
+	// Value 方法用于在 Context 中存储和检索与特定键关联的值
 	Value(key any) any
 }
 
@@ -232,6 +237,7 @@ type CancelFunc func()
 //
 // Canceling this context releases resources associated with it, so code should
 // call cancel as soon as the operations running in this Context complete.
+// 取消信号
 func WithCancel(parent Context) (ctx Context, cancel CancelFunc) {
 	c := withCancel(parent)
 	return c, func() { c.cancel(true, Canceled, nil) }
@@ -280,6 +286,7 @@ func withCancel(parent Context) *cancelCtx {
 // then [Cause] returns err.
 // Otherwise Cause(c) returns the same value as c.Err().
 // Cause returns nil if c has not been canceled yet.
+// 解释取消原因
 func Cause(c Context) error {
 	if cc, ok := c.Value(&cancelCtxKey).(*cancelCtx); ok {
 		cc.mu.Lock()
@@ -413,6 +420,7 @@ func init() {
 
 // A cancelCtx can be canceled. When canceled, it also cancels any children
 // that implement canceler.
+// 取消上下文
 type cancelCtx struct {
 	Context
 
@@ -423,6 +431,7 @@ type cancelCtx struct {
 	cause    error                 // set to non-nil by the first cancel call
 }
 
+// Value returns the value associated with key or nil if no value is associated
 func (c *cancelCtx) Value(key any) any {
 	if key == &cancelCtxKey {
 		return c
@@ -454,6 +463,7 @@ func (c *cancelCtx) Err() error {
 
 // propagateCancel arranges for child to be canceled when parent is.
 // It sets the parent context of cancelCtx.
+// 为子任务在父任务被取消时安排取消。
 func (c *cancelCtx) propagateCancel(parent Context, child canceler) {
 	c.Context = parent
 
@@ -603,6 +613,7 @@ func (c withoutCancelCtx) String() string {
 //
 // Canceling this context releases resources associated with it, so code should
 // call cancel as soon as the operations running in this [Context] complete.
+// 截止时间
 func WithDeadline(parent Context, d time.Time) (Context, CancelFunc) {
 	return WithDeadlineCause(parent, d, nil)
 }
@@ -610,6 +621,7 @@ func WithDeadline(parent Context, d time.Time) (Context, CancelFunc) {
 // WithDeadlineCause behaves like [WithDeadline] but also sets the cause of the
 // returned Context when the deadline is exceeded. The returned [CancelFunc] does
 // not set the cause.
+// 截止时间，解释取消原因
 func WithDeadlineCause(parent Context, d time.Time, cause error) (Context, CancelFunc) {
 	if parent == nil {
 		panic("cannot create context from nil parent")
