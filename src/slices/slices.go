@@ -15,10 +15,13 @@ import (
 // Otherwise, the elements are compared in increasing index order, and the
 // comparison stops at the first unequal pair.
 // Floating point NaNs are not considered equal.
+// 判断两个切片的长度是否相等
 func Equal[S ~[]E, E comparable](s1, s2 S) bool {
+	// 判断长度
 	if len(s1) != len(s2) {
 		return false
 	}
+	// 判断元素
 	for i := range s1 {
 		if s1[i] != s2[i] {
 			return false
@@ -32,12 +35,16 @@ func Equal[S ~[]E, E comparable](s1, s2 S) bool {
 // EqualFunc returns false. Otherwise, the elements are compared in
 // increasing index order, and the comparison stops at the first index
 // for which eq returns false.
+// 使用相等性检查两个切片是否相等
 func EqualFunc[S1 ~[]E1, S2 ~[]E2, E1, E2 any](s1 S1, s2 S2, eq func(E1, E2) bool) bool {
+	// 判断长度
 	if len(s1) != len(s2) {
 		return false
 	}
+	// 判断元素
 	for i, v1 := range s1 {
 		v2 := s2[i]
+		// 判断元素是否相等
 		if !eq(v1, v2) {
 			return false
 		}
@@ -52,12 +59,16 @@ func EqualFunc[S1 ~[]E1, S2 ~[]E2, E1, E2 any](s1 S1, s2 S2, eq func(E1, E2) boo
 // If both slices are equal until one of them ends, the shorter slice is
 // considered less than the longer one.
 // The result is 0 if s1 == s2, -1 if s1 < s2, and +1 if s1 > s2.
+// 比较两个切片的元素
 func Compare[S ~[]E, E cmp.Ordered](s1, s2 S) int {
+	// 按照元素顺序开始比较
 	for i, v1 := range s1 {
 		if i >= len(s2) {
 			return +1
 		}
+		// 直到一个元素不等于另一个元素
 		v2 := s2[i]
+		// 比较第一个不匹配的元素
 		if c := cmp.Compare(v1, v2); c != 0 {
 			return c
 		}
@@ -73,6 +84,7 @@ func Compare[S ~[]E, E cmp.Ordered](s1, s2 S) int {
 // The result is the first non-zero result of cmp; if cmp always
 // returns 0 the result is 0 if len(s1) == len(s2), -1 if len(s1) < len(s2),
 // and +1 if len(s1) > len(s2).
+// 使用自定义比较函数比较两个切片
 func CompareFunc[S1 ~[]E1, S2 ~[]E2, E1, E2 any](s1 S1, s2 S2, cmp func(E1, E2) int) int {
 	for i, v1 := range s1 {
 		if i >= len(s2) {
@@ -91,6 +103,7 @@ func CompareFunc[S1 ~[]E1, S2 ~[]E2, E1, E2 any](s1 S1, s2 S2, cmp func(E1, E2) 
 
 // Index returns the index of the first occurrence of v in s,
 // or -1 if not present.
+// 返回切片中第一个出现的值的索引
 func Index[S ~[]E, E comparable](s S, v E) int {
 	for i := range s {
 		if v == s[i] {
@@ -102,6 +115,7 @@ func Index[S ~[]E, E comparable](s S, v E) int {
 
 // IndexFunc returns the first index i satisfying f(s[i]),
 // or -1 if none do.
+// 返回切片中第一个满足条件的值的索引
 func IndexFunc[S ~[]E, E any](s S, f func(E) bool) int {
 	for i := range s {
 		if f(s[i]) {
@@ -112,12 +126,14 @@ func IndexFunc[S ~[]E, E any](s S, f func(E) bool) int {
 }
 
 // Contains reports whether v is present in s.
+// 返回切片中是否存在某个值
 func Contains[S ~[]E, E comparable](s S, v E) bool {
 	return Index(s, v) >= 0
 }
 
 // ContainsFunc reports whether at least one
 // element e of s satisfies f(e).
+// 返回切片中是否存在满足条件的值
 func ContainsFunc[S ~[]E, E any](s S, f func(E) bool) bool {
 	return IndexFunc(s, f) >= 0
 }
