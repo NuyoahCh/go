@@ -82,6 +82,7 @@ type uint uint
 
 // uintptr is an integer type that is large enough to hold the bit pattern of
 // any pointer.
+// uintptr 是一种足够大的整数类型，可以存储任何指针的位模式。
 type uintptr uintptr
 
 // byte is an alias for uint8 and is equivalent to uint8 in all ways. It is
@@ -91,6 +92,7 @@ type byte = uint8
 
 // rune is an alias for int32 and is equivalent to int32 in all ways. It is
 // used, by convention, to distinguish character values from integer values.
+// int32 is the set of all Unicode code points. 别名
 type rune = int32
 
 // any is an alias for interface{} and is equivalent to interface{} in all ways.
@@ -106,6 +108,7 @@ type comparable interface{ comparable }
 // iota is a predeclared identifier representing the untyped integer ordinal
 // number of the current const specification in a (usually parenthesized)
 // const declaration. It is zero-indexed.
+// 初始化就是 0，每遇到一个const就加1
 const iota = 0 // Untyped int.
 
 // nil is a predeclared identifier representing the zero value for a
@@ -134,6 +137,10 @@ type FloatType float32
 // stand-in for either complex type: complex64 or complex128.
 type ComplexType complex64
 
+/**
+The built-in functions are functions that are always available
+以下为初始 API
+*/
 // The append built-in function appends elements to the end of a slice. If
 // it has sufficient capacity, the destination is resliced to accommodate the
 // new elements. If it does not, a new underlying array will be allocated.
