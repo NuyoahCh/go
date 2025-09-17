@@ -33,6 +33,7 @@ import (
 // the n'th call to Unlock “synchronizes before” that call to RLock,
 // and the corresponding call to RUnlock “synchronizes before”
 // the n+1'th call to Lock.
+// 读写锁 RWMutex
 type RWMutex struct {
 	w           Mutex        // held if there are pending writers
 	writerSem   uint32       // semaphore for writers to wait for completing readers
@@ -41,6 +42,7 @@ type RWMutex struct {
 	readerWait  atomic.Int32 // number of departing readers
 }
 
+// 最大读者数
 const rwmutexMaxReaders = 1 << 30
 
 // Happens-before relationships are indicated to the race detector via:
