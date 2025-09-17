@@ -31,6 +31,7 @@ func fatal(string)
 // A successful call to TryLock is equivalent to a call to Lock.
 // A failed call to TryLock does not establish any “synchronizes before”
 // relation at all.
+// 互斥锁
 type Mutex struct {
 	state int32
 	sema  uint32
@@ -38,8 +39,8 @@ type Mutex struct {
 
 // A Locker represents an object that can be locked and unlocked.
 type Locker interface {
-	Lock()
-	Unlock()
+	Lock()   // 加锁
+	Unlock() // 解锁
 }
 
 const (
@@ -80,6 +81,7 @@ const (
 // blocks until the mutex is available.
 func (m *Mutex) Lock() {
 	// Fast path: grab unlocked mutex.
+	// CAS 比较并交换
 	if atomic.CompareAndSwapInt32(&m.state, 0, mutexLocked) {
 		if race.Enabled {
 			race.Acquire(unsafe.Pointer(m))
